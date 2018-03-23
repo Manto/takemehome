@@ -1,0 +1,48 @@
+.grid-box {
+  position: absolute;
+  border: 1px solid #666;
+  width: 75px;
+  height: 75px;
+  text-align: center;
+  background-color: #fff;
+  display: flex;
+  justify-content: center; /* align horizontal */
+  align-items: center; /* align vertical */
+}
+
+.grid-box.visited {
+  background-color: #ccc;
+  color: #333;
+}
+
+.grid-row {
+  position: absolute;
+}
+
+.grid-active {
+  border: 1px solid #393;
+  background-color: #dfc;
+  cursor: pointer;
+}
+
+.grid-movement-text {
+  font-size: 14px;
+  font-weight: bold;
+  cursor: default;
+}
+
+.character {
+  position: absolute;
+  width: 75px;
+  height: 75px;
+  text-align: center;
+  background-color: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.character-label {
+  padding: 4px;
+  background-color: rgba(216, 128, 64, 0.5);
+}
