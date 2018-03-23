@@ -14,7 +14,7 @@ export default class App extends React.Component {
   }
 
   componentWillMount() {
-    this.props.levelStore.initialize(8, 8);
+    this.props.levelStore.initialize(5, 5);
   }
 
   render() {

@@ -1,5 +1,5 @@
 import { types, getParent } from "mobx-state-tree";
-import { getRandomInt, getRandomElement } from "Utils/math-utils";
+import { getRandomInt, getRandomElement, shuffleArray } from "Utils/math-utils";
 
 const getGridKey = (x, y) => {
   return `${x}-${y}`;
@@ -7,7 +7,11 @@ const getGridKey = (x, y) => {
 
 export const GridItem = types.model("GridItem", {
   id: types.identifier(),
-  name: types.string
+  name: types.string,
+  type: types.string,
+  obtained: types.boolean,
+  positionX: types.maybe(types.number),
+  positionY: types.maybe(types.number)
 });
 
 export const Character = types
@@ -99,6 +103,24 @@ export const LevelStore = types
         }
       }
       return count;
+    },
+    getObtainedStarCount() {
+      let count = 0;
+      for (let i = 0; i < self.items.length; i++) {
+        if (self.items[i].type === "star" && self.items[i].obtained) {
+          count += 1;
+        }
+      }
+      return count;
+    },
+    getTotalStarCount() {
+      let count = 0;
+      for (let i = 0; i < self.items.length; i++) {
+        if (self.items[i].type === "star") {
+          count += 1;
+        }
+      }
+      return count;
     }
   }))
   .actions(self => {
@@ -124,6 +146,8 @@ export const LevelStore = types
         grids.push(row);
       }
       self.grids = grids;
+      self.items = [];
+      self.characters = [];
       self.generateLevel();
       self.isInitialized = true;
     };
@@ -154,6 +178,9 @@ export const LevelStore = types
 
       let currentX = startX;
       let currentY = startY;
+      self.grids[currentX][currentY].isStartGrid = true;
+      map[currentX][currentY].visitCount = 1;
+
       // returns a list of possible next locations to jump to, array of object:
       // [ { x: 1, y: 3, distance: 3 }, {...}... ]
       const getPossibleNextGrids = (map, currentX, currentY) => {
@@ -205,6 +232,8 @@ export const LevelStore = types
       };
 
       let nextGridMaps, nextGridMap, thisGrid;
+      let gridPath = []; // array of grids the path goes thru
+
       while (thisStep < totalSteps) {
         nextGridMaps = getPossibleNextGrids(map, currentX, currentY);
         if (nextGridMaps.length === 0) {
@@ -217,6 +246,7 @@ export const LevelStore = types
         thisGrid.nextGrid = self.grids[(nextGridMap.x, nextGridMap.y)];
         thisGrid.movement = nextGridMap.distance;
         thisGrid.isEnterable = true;
+        gridPath.push(thisGrid);
 
         // update our in progress map
         map[nextGridMap.x][nextGridMap.y].visitCount += 1;
@@ -228,6 +258,22 @@ export const LevelStore = types
 
         thisStep += 1;
       }
+
+      // randomly pick 3 in the path to place stars
+      const starGrids = shuffleArray(
+        gridPath.slice(2, gridPath.length - 2)
+      ).slice(0, 3);
+      starGrids.forEach((grid, i) => {
+        const star = GridItem.create({
+          id: `star${i}`,
+          name: "star",
+          type: "star",
+          positionX: grid.x,
+          positionY: grid.y,
+          obtained: false
+        });
+        self.items.push(star);
+      });
 
       // mark current tile as exit
       thisGrid = self.grids[currentX][currentY];
@@ -261,12 +307,19 @@ export const LevelStore = types
         }
       }
 
+      // check if we picked up item
+      self.items.forEach(item => {
+        if (item.positionX === x && item.positionY === y) {
+          item.obtained = true;
+        }
+      });
+
       if (grid.isExitGrid) {
         alert(
-          "Exited with score of " +
-            self.getVisitedGridCount() +
+          "Exited with Star Count: " +
+            self.getObtainedStarCount() +
             " of " +
-            self.getTotalGridCount()
+            self.getTotalStarCount()
         );
       }
     };

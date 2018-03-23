@@ -40,9 +40,45 @@
   display: flex;
   justify-content: center;
   align-items: flex-end;
+  pointer-events: none;
 }
 
 .character-label {
   padding: 4px;
   background-color: rgba(216, 128, 64, 0.5);
+}
+
+.item {
+  position: absolute;
+  width: 75px;
+  height: 75px;
+  text-align: center;
+  background-color: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.item-label {
+  padding: 4px;
+  font-size: 64px;
+}
+
+.item-label-obtained {
+  padding: 4px;
+  font-size: 64px;
+  color: rgba(0, 0, 0, 0.33);
+}
+
+button {
+  font-size: 14px;
+  border: 1px solid;
+  margin: 2px 4px 2px 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  color: #fff;
+  background-color: #693;
 }

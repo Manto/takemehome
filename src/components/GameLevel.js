@@ -30,6 +30,9 @@ export class GameLevel extends React.Component {
               </div>
             );
           })}
+          {levelStore.items.map((item, i) => {
+            return <ItemSprite key={i} data={item} />;
+          })}
           {levelStore.characters.map((character, i) => {
             return <CharacterSprite key={i} data={character} />;
           })}
@@ -44,12 +47,47 @@ export class GameLevel extends React.Component {
 @inject("levelStore")
 @observer
 export class GameLevelHud extends React.Component {
+  onClickEasy = () => {
+    this.props.levelStore.initialize(5, 5);
+  };
+  onClickMedium = () => {
+    this.props.levelStore.initialize(6, 6);
+  };
+
+  onClickHard = () => {
+    this.props.levelStore.initialize(8, 8);
+  };
+
   render() {
     const { levelStore } = this.props;
     return (
-      <div>
-        Visited: {levelStore.getVisitedGridCount()} /{" "}
-        {levelStore.getTotalGridCount()}
+      <div style={{ padding: "15px" }}>
+        Stars: {levelStore.getObtainedStarCount()} /{" "}
+        {levelStore.getTotalStarCount()}
+        <br />
+        Restart:
+        <button onClick={this.onClickEasy}>Easy</button>
+        <button onClick={this.onClickMedium}>Medium</button>
+        <button onClick={this.onClickHard}>Hard</button>
+      </div>
+    );
+  }
+}
+
+@inject("levelStore")
+@observer
+class ItemSprite extends React.Component {
+  render() {
+    const { data } = this.props;
+
+    return (
+      <div
+        className="item"
+        style={{ left: data.positionX * 75, top: data.positionY * 75 }}
+      >
+        <span className={data.obtained ? "item-label-obtained" : "item-label"}>
+          {data.obtained ? "★" : "☆"}
+        </span>
       </div>
     );
   }
@@ -121,7 +159,7 @@ class LevelGridSprite extends React.Component {
         {data.movement > 0 && (
           <div className="grid-movement-text">{data.movement}</div>
         )}
-        {data.isExitGrid && <div className="grid-movement-text">EXIT</div>}
+        {data.isExitGrid && <div className="grid-movement-text">HOME!</div>}
       </div>
     );
   }
